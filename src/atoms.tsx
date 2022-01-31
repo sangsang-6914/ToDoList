@@ -1,33 +1,20 @@
 import { atom, selector } from 'recoil'
 
-export enum Categories {
-    "TODO" = "TODO",
-    "DOING" = "DOING",
-    "DONE" = "DONE"
-}
-
-export interface IToDo {
-    text: string;
-    id: number;
-    category: Categories;
-}
-
-export const ToDoState = atom<IToDo[]>({
-    key: 'toDos',
-    default: []
+export const minuteState = atom({
+    key: 'minutes',
+    default: 111
 })
 
-export const CategoryState = atom<Categories>({
-    key: 'category',
-    default: Categories.TODO
-})
-
-export const TodosSelector = selector({
-    key: 'todoSelector',
+export const hourSelector = selector<number>({
+    key: 'hours',
     get: ({get}) => {
-        const category = get(CategoryState)
-        const toDos = get(ToDoState)
+        const minute = get(minuteState)
         
-        return toDos.filter(toDo => toDo.category === category)
+        return minute / 60
+    },
+    set: ({set}, newValue) => {
+        const minutes = Number(newValue) * 60
+        set(minuteState, minutes)
     }
+    
 })
