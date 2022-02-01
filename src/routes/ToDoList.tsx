@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import styled from 'styled-components'
-import { Categories, CategoryState, TodosSelector, ToDoState } from '../atoms'
+import { CategoryArrayState, CategoryState, TodosSelector, ToDoState } from '../atoms'
 import CreateToDo from './CreateToDo'
 import ToDo from './ToDo'
 
@@ -32,19 +32,24 @@ const Title = styled.div`
 
 function ToDoList () {
     const setToDos = useSetRecoilState(ToDoState)
+    const [categories, setCategories] = useRecoilState(CategoryArrayState)
     useEffect(() => {
         const todoData = localStorage.getItem('toDos')
-        console.log(todoData)
         if ( todoData !== null) {
             const toDos = JSON.parse(todoData)
             setToDos(toDos)
+        }
+        const catData = localStorage.getItem('category')
+        if (catData !== null) {
+            const category = JSON.parse(catData)
+            setCategories(category)
         }
     }, [])
     const toDos = useRecoilValue(TodosSelector)
     const setCategory = useSetRecoilState(CategoryState)
     const changeCategory = (event:React.FormEvent<HTMLSelectElement>) => {
         const {currentTarget: {value}} = event
-        setCategory(value as any)
+        setCategory(value)
     }
     return (
         <Container>
@@ -52,9 +57,9 @@ function ToDoList () {
                 <Title>Todo List</Title>
             </Header>
             <select onInput={changeCategory}>
-                <option value={Categories.TODO}>TODO</option>
-                <option value={Categories.DOING}>DOING</option>
-                <option value={Categories.DONE}>DONE</option>
+                {categories.map(cat => (
+                    <option value={cat} key={cat}>{cat}</option>
+                ))}
             </select>
             <CreateToDo />
             { toDos.map(todo => (
